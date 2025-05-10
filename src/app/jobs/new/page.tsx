@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, PlusCircle, Save, User, CalendarDays } from 'lucide-react';
@@ -14,7 +14,7 @@ const mockClients = [
 
 const mockTechnicians = ['Mike L.', 'Sarah B.', 'Chris P.'];
 
-const CreateJobPage = () => {
+const JobFormContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const clientIdFromQuery = searchParams.get('clientId');
@@ -37,6 +37,73 @@ const CreateJobPage = () => {
   };
 
   return (
+    <form onSubmit={handleSubmit} className='bg-white p-6 sm:p-8 rounded-lg shadow space-y-6'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div>
+          <label htmlFor='clientId' className='form-label flex items-center'><User size={14} className="mr-1.5 text-gray-400"/>Client</label>
+          <select id='clientId' value={clientId} onChange={(e) => setClientId(e.target.value)} className='default-select' required>
+            <option value="" disabled>Select a client</option>
+            {mockClients.map(client => (
+              <option key={client.id} value={client.id}>{client.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor='priority' className='form-label'>Priority</label>
+          <select id='priority' value={priority} onChange={(e) => setPriority(e.target.value)} className='default-select'>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor='serviceAddress' className='form-label'>Service Address</label>
+        <input type='text' id='serviceAddress' value={serviceAddress} onChange={(e) => setServiceAddress(e.target.value)} className='default-input' required />
+      </div>
+      
+      <div>
+        <label htmlFor='description' className='form-label'>Job Description</label>
+        <textarea id='description' value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className='default-textarea' required></textarea>
+      </div>
+
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div>
+          <label htmlFor='scheduledDate' className='form-label flex items-center'><CalendarDays size={14} className="mr-1.5 text-gray-400"/>Scheduled Date</label>
+          <input type='date' id='scheduledDate' value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} className='default-input' />
+        </div>
+        <div>
+          <label htmlFor='scheduledTime' className='form-label'>Scheduled Time</label>
+          <input type='time' id='scheduledTime' value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} className='default-input' />
+        </div>
+      </div>
+
+      <div>
+          <label htmlFor='assignedTechnicians' className='form-label'>Assign Technician(s)</label>
+          <select 
+              multiple 
+              id='assignedTechnicians' 
+              value={assignedTechnicians}
+              onChange={(e) => setAssignedTechnicians(Array.from(e.target.selectedOptions, option => option.value))}
+              className='default-select h-24'
+          >
+              {mockTechnicians.map(tech => <option key={tech} value={tech}>{tech}</option>)}
+          </select>
+          <p className='text-xs text-gray-500 mt-1'>Hold Ctrl/Cmd to select multiple.</p>
+      </div>
+      
+      <div className='pt-4 border-t flex justify-end'>
+          <button type="submit" className='btn-primary'>
+              <Save size={18} className="mr-2" /> Create Job
+          </button>
+      </div>
+    </form>
+  );
+};
+
+const CreateJobPage = () => {
+  return (
     <div>
       <div className='flex justify-between items-center mb-6'>
         <h1 className='text-3xl font-bold text-dark flex items-center'>
@@ -46,69 +113,9 @@ const CreateJobPage = () => {
           <ArrowLeft size={16} className="mr-1.5" /> Back to Job List
         </Link>
       </div>
-
-      <form onSubmit={handleSubmit} className='bg-white p-6 sm:p-8 rounded-lg shadow space-y-6'>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          <div>
-            <label htmlFor='clientId' className='form-label flex items-center'><User size={14} className="mr-1.5 text-gray-400"/>Client</label>
-            <select id='clientId' value={clientId} onChange={(e) => setClientId(e.target.value)} className='default-select' required>
-              <option value="" disabled>Select a client</option>
-              {mockClients.map(client => (
-                <option key={client.id} value={client.id}>{client.name}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor='priority' className='form-label'>Priority</label>
-            <select id='priority' value={priority} onChange={(e) => setPriority(e.target.value)} className='default-select'>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor='serviceAddress' className='form-label'>Service Address</label>
-          <input type='text' id='serviceAddress' value={serviceAddress} onChange={(e) => setServiceAddress(e.target.value)} className='default-input' required />
-        </div>
-        
-        <div>
-          <label htmlFor='description' className='form-label'>Job Description</label>
-          <textarea id='description' value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className='default-textarea' required></textarea>
-        </div>
-
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          <div>
-            <label htmlFor='scheduledDate' className='form-label flex items-center'><CalendarDays size={14} className="mr-1.5 text-gray-400"/>Scheduled Date</label>
-            <input type='date' id='scheduledDate' value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} className='default-input' />
-          </div>
-          <div>
-            <label htmlFor='scheduledTime' className='form-label'>Scheduled Time</label>
-            <input type='time' id='scheduledTime' value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} className='default-input' />
-          </div>
-        </div>
-
-        <div>
-            <label htmlFor='assignedTechnicians' className='form-label'>Assign Technician(s)</label>
-            <select 
-                multiple 
-                id='assignedTechnicians' 
-                value={assignedTechnicians}
-                onChange={(e) => setAssignedTechnicians(Array.from(e.target.selectedOptions, option => option.value))}
-                className='default-select h-24'
-            >
-                {mockTechnicians.map(tech => <option key={tech} value={tech}>{tech}</option>)}
-            </select>
-            <p className='text-xs text-gray-500 mt-1'>Hold Ctrl/Cmd to select multiple.</p>
-        </div>
-        
-        <div className='pt-4 border-t flex justify-end'>
-            <button type="submit" className='btn-primary'>
-                <Save size={18} className="mr-2" /> Create Job
-            </button>
-        </div>
-      </form>
+      <Suspense fallback={<div className='text-center p-8'>Loading job form...</div>}>
+        <JobFormContent />
+      </Suspense>
     </div>
   );
 };
