@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent, Suspense } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, PlusCircle, Trash2, Save, Send, Info, Hash, CalendarDays, User, Package, Percent, ScrollText } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation'; // For leadId pre-fill
@@ -24,7 +24,7 @@ interface LineItem {
   unitPrice: number;
 }
 
-const CreateQuotePage = () => {
+const CreateQuoteForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const leadIdFromQuery = searchParams.get('leadId');
@@ -216,7 +216,13 @@ const CreateQuotePage = () => {
   );
 };
 
+const Page = () => (
+  <Suspense>
+    <CreateQuoteForm />
+  </Suspense>
+);
+
 // Add .input-sm to globals.css for smaller input fields if needed
 // .input-sm { @apply py-1.5 text-xs; }
 
-export default CreateQuotePage; 
+export default Page; 
