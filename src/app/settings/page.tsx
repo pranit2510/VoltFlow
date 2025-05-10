@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import Link from 'next/link';
+// import Link from 'next/link'; // Removed unused Link
 import {
   Settings as SettingsIconPage, // For page title
   Building2, // Company Profile
@@ -46,8 +46,8 @@ const initialItemsList = [
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('companyProfile');
   const [companyProfile, setCompanyProfile] = useState(initialCompanyProfile);
-  const [users, setUsers] = useState(mockUsers);
-  const [items, setItems] = useState(initialItemsList); // State for products/services
+  const [users] = useState(mockUsers); // Removed setUsers
+  const [items] = useState(initialItemsList); // Removed setItems
 
   const handleProfileChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

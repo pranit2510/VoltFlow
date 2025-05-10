@@ -5,11 +5,8 @@ import {
   BarChart3,
   DollarSign,
   Briefcase,
-  Users,
-  Clock,
   TrendingUp,
   FileWarning,
-  CalendarDays,
   Filter
 } from 'lucide-react';
 

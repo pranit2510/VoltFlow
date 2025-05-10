@@ -10,7 +10,7 @@ const TodaysScheduleWidget = () => {
 
   return (
     <div className='bg-white p-6 rounded-lg shadow h-full'>
-      <h3 className='text-xl font-semibold text-gray-800 mb-4'>Today's Schedule</h3>
+      <h3 className='text-xl font-semibold text-gray-800 mb-4'>Today&apos;s Schedule</h3>
       {todaysJobs.length > 0 ? (
         <ul className='space-y-4'>
           {todaysJobs.map((job) => (
