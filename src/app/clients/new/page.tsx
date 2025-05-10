@@ -3,7 +3,7 @@
 import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, PlusCircle, User, Save } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Save } from 'lucide-react';
 
 const CreateClientPage = () => {
   const router = useRouter();

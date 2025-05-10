@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, PlusCircle, Trash2, Save, Send, Settings, Info, Hash, CalendarDays, User, Package, DollarSign, Percent, ScrollText } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Trash2, Save, Send, Info, Hash, CalendarDays, User, Package, Percent, ScrollText } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation'; // For leadId pre-fill
 
 // Mock client data for dropdown

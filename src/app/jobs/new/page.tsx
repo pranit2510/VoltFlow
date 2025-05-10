@@ -3,7 +3,7 @@
 import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, PlusCircle, Briefcase, Save, User, CalendarDays } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Save, User, CalendarDays } from 'lucide-react';
 
 // Mock client data for dropdown
 const mockClients = [

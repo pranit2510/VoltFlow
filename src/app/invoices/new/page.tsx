@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent, FormEvent, Suspense } from 'react';
+import React, { useState, useEffect, FormEvent, Suspense } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -8,7 +8,6 @@ import {
   Trash2,
   Save,
   Send,
-  Settings,
   Info,
   Hash,
   CalendarDays,

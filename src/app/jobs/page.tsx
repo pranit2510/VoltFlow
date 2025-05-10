@@ -6,10 +6,6 @@ import {
   PlusCircle,
   Search,
   Briefcase,
-  Users,
-  CalendarDays,
-  UserCheck,
-  ListFilter,
   Eye,
   Edit3,
   Trash2

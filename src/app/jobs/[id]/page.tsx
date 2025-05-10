@@ -6,12 +6,8 @@ import { useParams } from 'next/navigation';
 import {
   ArrowLeft,
   Edit3,
-  FileText as FileTextIcon, // For Generate Invoice & Link to Quote
   Briefcase,
-  User,
-  MapPin,
   CalendarDays,
-  Users as UsersIcon,
   ClipboardList,
   Wrench,
   Camera,

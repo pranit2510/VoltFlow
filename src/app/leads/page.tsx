@@ -6,12 +6,9 @@ import {
   PlusCircle,
   Search,
   Lightbulb,
-  Filter,
   Eye,
   Edit3,
   Trash2,
-  DollarSign,
-  CalendarCheck2,
   Phone,
   Mail
 } from 'lucide-react';

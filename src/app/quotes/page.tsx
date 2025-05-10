@@ -6,14 +6,10 @@ import {
   PlusCircle,
   Search,
   FileText as FileTextIcon, // Page Icon
-  Filter,
   Eye,
   Edit3,
   Trash2,
-  Send,
-  DollarSign,
-  CalendarDays,
-  User
+  Send
 } from 'lucide-react';
 
 // Mock data for quotes - replace with API data later

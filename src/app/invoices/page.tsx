@@ -6,14 +6,10 @@ import {
   PlusCircle,
   Search,
   Receipt as ReceiptIcon, // Page Icon
-  Filter,
   Eye,
   Edit3,
   Trash2,
   Send,
-  DollarSign,
-  CalendarDays,
-  User,
   CreditCard // For Record Payment
 } from 'lucide-react';
 

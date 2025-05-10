@@ -7,6 +7,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable, draggable, clickable
 import listPlugin from '@fullcalendar/list';
+import { EventClickArg, DateSelectArg } from '@fullcalendar/core'; // Import specific types
 
 // REMOVED FullCalendar CSS imports - relying on plugins to inject their styles
 // import '@fullcalendar/core/main.css'; 
@@ -14,7 +15,7 @@ import listPlugin from '@fullcalendar/list';
 // import '@fullcalendar/timegrid/main.css';
 // import '@fullcalendar/list/main.css';
 
-import { PlusCircle, CalendarDays as CalendarIcon, UserCheck, Filter } from 'lucide-react';
+import { PlusCircle, CalendarDays as CalendarIcon } from 'lucide-react';
 
 // Mock job data for calendar events
 const mockScheduledJobs = [
@@ -77,16 +78,16 @@ const CalendarPage = () => {
     }
   }, [selectedTechnician]);
 
-  const handleEventClick = (clickInfo: any) => {
+  const handleEventClick = (clickInfo: EventClickArg) => {
     // In a real app, show a modal or navigate to job details
     alert(`Event Clicked: ${clickInfo.event.title}\nJob ID: ${clickInfo.event.id}\nStatus: ${clickInfo.event.extendedProps.status}`);
     // Example navigation: router.push(`/jobs/${clickInfo.event.id}`);
   };
 
-  const handleDateSelect = (selectInfo: any) => {
+  const handleDateSelect = (selectInfo: DateSelectArg) => {
     // For creating new events by selecting dates
-    let title = prompt('Please enter a new title for your event');
-    let calendarApi = selectInfo.view.calendar;
+    const title = prompt('Please enter a new title for your event');
+    const calendarApi = selectInfo.view.calendar;
 
     calendarApi.unselect(); // clear date selection
 

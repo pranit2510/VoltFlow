@@ -3,7 +3,7 @@
 import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, PlusCircle, Lightbulb, Save, User, DollarSign, CalendarCheck2 } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Save, DollarSign, CalendarCheck2 } from 'lucide-react';
 
 // Mock data for dropdowns
 const leadStatusOptions = ['New', 'Contacted', 'Proposal Sent', 'Negotiation', 'Closed-Won', 'Closed-Lost', 'On Hold'];
