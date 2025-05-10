@@ -1,26 +1,64 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* FullCalendar Styles - REMOVING THESE FROM HERE */
+/* @import '@fullcalendar/common/main.css'; */
+/* @import '@fullcalendar/daygrid/main.css'; */
+/* @import '@fullcalendar/timegrid/main.css'; */
+/* @import '@fullcalendar/list/main.css'; */
+/* End FullCalendar Styles */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Using Tailwind's theme for colors, so these might not be strictly needed here anymore 
+     unless for very specific overrides not covered by utility classes.
+     For now, keeping them for potential direct CSS usage if desired.
+  */
+  --background: #ffffff; /* Default white, can be overridden by body bg-light */
+  --foreground: #111827; /* Default dark gray, can be overridden by body text-dark */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Dark mode will be a future enhancement, so these are placeholders or can be removed for now if not used. */
+    /* --background: #0a0a0a; */
+    /* --foreground: #ededed; */
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-light text-dark antialiased;
+  /* Ensure a base font size if needed, though Tailwind's preflight often handles this */
+  /* font-size: 16px; */ 
 }
+
+/* Custom Button Styles */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-150;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-dark bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-150;
+  }
+  /* Basic Form Styling - can be expanded */
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+  .default-input,
+  .default-select,
+  .default-textarea {
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm;
+  }
+  .default-select {
+    @apply pr-8; /* For select dropdown arrow */
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs font-medium; /* Ensure font-medium is consistent */
+  }
+  .input-sm {
+    @apply py-1.5 px-2 text-xs rounded-md; /* Added rounded-md for consistency */
+  }
+  /* Add more button variants or other component styles here if needed */
+}
+
+/* You can add other global styles here if necessary */
