@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import {
   ArrowLeft,
   Save,
@@ -59,7 +59,6 @@ const leadStatusColors: { [key: string]: string } = {
 
 const LeadEditPage = () => {
   const params = useParams();
-  const router = useRouter();
   const leadId = params.id as string;
   const [leadData, setLeadData] = useState<typeof mockLeads[0] | null>(null);
   const [saved, setSaved] = useState(false);

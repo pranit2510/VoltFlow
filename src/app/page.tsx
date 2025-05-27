@@ -17,7 +17,7 @@ import {
 // Dynamically import GridLayout to avoid SSR issues
 const GridLayout = dynamic(() => import('react-grid-layout').then(mod => mod.default || mod), {
   ssr: false,
-}) as any;
+}) as React.ComponentType<any>;
 
 // Import dashboard widgets
 import TodaysScheduleWidget from '@/components/dashboard/TodaysScheduleWidget';
@@ -66,10 +66,15 @@ export default function DashboardPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleLayoutChange = (newLayout: any) => {
-    setLayout(newLayout);
+  const handleLayoutChange = (newLayout: Array<{i: string; x: number; y: number; w: number; h: number; minW?: number; minH?: number}>) => {
+    // Merge with existing layout to preserve minW and minH
+    const updatedLayout = layout.map(item => {
+      const newItem = newLayout.find(n => n.i === item.i);
+      return newItem ? { ...item, ...newItem } : item;
+    });
+    setLayout(updatedLayout);
     // Save to localStorage
-    localStorage.setItem('dashboardLayout', JSON.stringify(newLayout));
+    localStorage.setItem('dashboardLayout', JSON.stringify(updatedLayout));
   };
 
   const resetLayout = () => {

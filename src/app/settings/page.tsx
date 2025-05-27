@@ -117,7 +117,10 @@ const SettingsPage = () => {
               <label htmlFor='logoUrl' className='form-label'>Company Logo URL (Placeholder)</label>
               <input type='text' id='logoUrl' name='logoUrl' value={companyProfile.logoUrl} onChange={handleProfileChange} className='default-input' />
               {/* In a real app, this would be a file upload component */}
-              {companyProfile.logoUrl && <img src={companyProfile.logoUrl} alt="Company Logo" className="mt-2 h-16 w-auto bg-gray-100 p-1 rounded"/>}
+                              {companyProfile.logoUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={companyProfile.logoUrl} alt="Company Logo" className="mt-2 h-16 w-auto bg-gray-100 p-1 rounded"/>
+                )}
             </div>
             <div>
               <label htmlFor='defaultQuoteTerms' className='form-label'>Default Quote Terms & Conditions</label>

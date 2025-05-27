@@ -28,7 +28,7 @@ const VoiceAgentPage = () => {
     setIsEditing(section);
   };
 
-  const handleSave = (section: string) => {
+  const handleSave = () => {
     // Here you would typically save the changes to your backend
     setIsEditing(null);
   };
@@ -181,7 +181,7 @@ const VoiceAgentPage = () => {
         {/* Stats and Analytics */}
         <div className="space-y-4 sm:space-y-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Today's Stats</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Today&apos;s Stats</h2>
             <div className="space-y-4">
               <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <p className="text-sm text-gray-500">Total Calls</p>
