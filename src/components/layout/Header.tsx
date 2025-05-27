@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Menu as MenuIcon,
   Search as SearchIcon,
@@ -10,93 +11,166 @@ import {
   Settings as SettingsIcon,
   LogOut as LogOutIcon,
   Zap,
+  X,
 } from 'lucide-react';
 
 const Header = () => {
-  // Placeholder state for user dropdown, can be expanded later
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  // Placeholder for mobile menu toggle function
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Focus search input when opened
+  useEffect(() => {
+    if (searchOpen && searchRef.current) {
+      searchRef.current.focus();
+    }
+  }, [searchOpen]);
+
   const toggleMobileMenu = () => {
-    console.log('Mobile menu toggled'); // Actual implementation will involve shared state
+    // Emit event for sidebar to listen to
+    window.dispatchEvent(new CustomEvent('toggle-mobile-menu'));
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Implement global search functionality
+      console.log('Searching for:', searchQuery);
+      setSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
+
+  const handleLogout = () => {
+    setUserDropdownOpen(false);
+    // Add logout animation
+    document.body.classList.add('fade-out');
+    setTimeout(() => {
+      router.push('/login');
+    }, 300);
   };
 
   return (
-    <header className='bg-white text-dark shadow-md sticky top-0 z-50'>
+    <header className='bg-white text-dark shadow-md sticky top-0 z-50 transition-all duration-200'>
       <div className='container mx-auto px-4 h-16 flex justify-between items-center'>
-        {/* Left side: Hamburger Menu (mobile) & App Name/Logo (optional) */}
+        {/* Left side: Hamburger Menu (mobile) & App Name/Logo */}
         <div className='flex items-center'>
           <button
             onClick={toggleMobileMenu}
-            className='md:hidden mr-2 p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary'
+            className='md:hidden mr-2 p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 active:scale-95'
             aria-label='Open navigation menu'
           >
             <MenuIcon className='h-6 w-6 text-gray-600' />
           </button>
-          <Link href="/" className='flex items-center text-xl font-bold text-primary'>
-            <Zap size={24} className="mr-2" />
-            <span>VoltFlow CRM</span>
+          <Link href="/" className='flex items-center text-xl font-bold text-primary group'>
+            <Zap size={24} className="mr-2 group-hover:rotate-12 transition-transform duration-300" />
+            <span className="hidden sm:inline">VoltFlow CRM</span>
+            <span className="sm:hidden">VoltFlow</span>
           </Link>
         </div>
 
-        {/* Middle: Global Search Bar - simplified for now */}
-        <div className='flex-1 max-w-xl px-4 hidden sm:block'> {/* Hide search on very small screens to avoid clutter */}
-          <div className='relative'>
-            <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-              <SearchIcon className='h-5 w-5 text-gray-400' />
-            </div>
+        {/* Middle: Global Search Bar */}
+        <div className='hidden md:flex flex-1 max-w-md mx-4'>
+          <form onSubmit={handleSearch} className='relative w-full'>
+            <SearchIcon className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
             <input
               type='search'
-              name='global-search'
-              id='global-search'
-              className='default-input pl-10'
-              placeholder='Search clients, jobs...'
+              placeholder='Search clients, jobs, invoices...'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200'
             />
-          </div>
+          </form>
         </div>
 
-        {/* Right side: Notifications & User Profile */}
-        <div className='flex items-center space-x-2 sm:space-x-3'>
+        {/* Right side: Icons & User Menu */}
+        <div className='flex items-center space-x-2 sm:space-x-4'>
+          {/* Mobile Search Toggle */}
           <button
-            className='p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
-            aria-label='View notifications'
+            onClick={() => setSearchOpen(!searchOpen)}
+            className='md:hidden p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 active:scale-95'
+            aria-label='Toggle search'
           >
-            <BellIcon className='h-6 w-6 text-gray-600' />
-            {/* Notification badge can be added here */}
+            {searchOpen ? <X size={20} /> : <SearchIcon size={20} />}
           </button>
 
-          <div className='relative'>
+          {/* Notifications */}
+          <button
+            className='relative p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 active:scale-95 group'
+            aria-label='View notifications'
+          >
+            <BellIcon className='h-6 w-6 text-gray-600 group-hover:text-gray-900 transition-colors duration-200' />
+            <span className='absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse' />
+          </button>
+
+          {/* User Dropdown */}
+          <div className='relative' ref={dropdownRef}>
             <button
               onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              className='p-1 sm:p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
+              className='p-1 sm:p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 active:scale-95'
               aria-label='User menu'
               aria-haspopup='true'
               aria-expanded={userDropdownOpen}
             >
-              <UserCircleIcon className='h-7 w-7 text-gray-600' />
+              <UserCircleIcon className='h-7 w-7 text-gray-600 hover:text-gray-900 transition-colors duration-200' />
             </button>
-            {/* Basic Dropdown - to be styled and improved */}
+            
+            {/* Dropdown Menu */}
             {userDropdownOpen && (
-              <div className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10'>
+              <div className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 fade-in'>
+                <div className='px-4 py-2 border-b border-gray-200'>
+                  <p className='text-sm font-medium text-gray-900'>John Doe</p>
+                  <p className='text-xs text-gray-500'>john@example.com</p>
+                </div>
                 <Link
                   href='/settings'
-                  className='flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                  className='flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200'
                   onClick={() => setUserDropdownOpen(false)}
                 >
-                  <SettingsIcon className='mr-2 h-5 w-5' /> Account Settings
+                  <SettingsIcon className='mr-2 h-4 w-4' /> Account Settings
                 </Link>
                 <button
-                  // onClick={handleLogout} // Placeholder for logout function
-                  onClick={() => { alert('Logout (mock)'); setUserDropdownOpen(false); /* router.push('/login'); */ }}
-                  className='w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                  onClick={handleLogout}
+                  className='w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200'
                 >
-                  <LogOutIcon className='mr-2 h-5 w-5' /> Logout
+                  <LogOutIcon className='mr-2 h-4 w-4' /> Logout
                 </button>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Mobile Search Bar */}
+      {searchOpen && (
+        <div className='md:hidden border-t border-gray-200 p-4 fade-in'>
+          <form onSubmit={handleSearch} className='relative'>
+            <SearchIcon className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
+            <input
+              ref={searchRef}
+              type='search'
+              placeholder='Search...'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200'
+            />
+          </form>
+        </div>
+      )}
     </header>
   );
 };
