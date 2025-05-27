@@ -25,12 +25,12 @@ const VoiceAgentPage = () => {
   };
 
   const handleEdit = (section: string) => {
-    setIsEditing(section);
-  };
-
-  const handleSave = () => {
-    // Here you would typically save the changes to your backend
-    setIsEditing(null);
+    if (isEditing === section) {
+      // Save logic would go here
+      setIsEditing(null);
+    } else {
+      setIsEditing(section);
+    }
   };
 
   return (

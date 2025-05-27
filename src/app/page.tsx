@@ -17,6 +17,7 @@ import {
 // Dynamically import GridLayout to avoid SSR issues
 const GridLayout = dynamic(() => import('react-grid-layout').then(mod => mod.default || mod), {
   ssr: false,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }) as React.ComponentType<any>;
 
 // Import dashboard widgets
