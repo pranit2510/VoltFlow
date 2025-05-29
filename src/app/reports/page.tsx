@@ -18,6 +18,10 @@ const MetaAdsSection = dynamic(() => import('./meta-ads-section'), {
   loading: () => <SkeletonLoader variant="card" />
 });
 
+const MarketingChannelsSection = dynamic(() => import('./marketing-channels-section'), {
+  loading: () => <SkeletonLoader variant="card" />
+});
+
 const ReportSection = ({ 
   title, 
   icon: Icon, 
@@ -190,6 +194,11 @@ const ReportsPage = () => {
           </>
         ) : (
           <>
+            {/* Marketing Channels - Full Width */}
+            <div className="lg:col-span-2">
+              <MarketingChannelsSection />
+            </div>
+
             <MetaAdsSection />
 
             <ReportSection 
