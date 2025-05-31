@@ -4,22 +4,44 @@ import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, PlusCircle, Save } from 'lucide-react';
+import { clientOperations } from '@/lib/supabase-client';
 
 const CreateClientPage = () => {
   const router = useRouter();
-  // Add state for form fields here, e.g.:
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Form state
   const [clientName, setClientName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  // ... other fields
+  const [address, setAddress] = useState('');
+  const [notes, setNotes] = useState('');
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Mock save logic
-    console.log('Saving new client:', { clientName, companyName, email, phone });
-    alert('New client saved (mock)!');
-    router.push('/clients');
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const newClient = await clientOperations.create({
+        name: clientName,
+        company: companyName,
+        email,
+        phone,
+        address,
+        notes,
+        status: 'active'
+      });
+
+      router.push('/clients');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create client');
+      console.error('Error creating client:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -33,29 +55,92 @@ const CreateClientPage = () => {
         </Link>
       </div>
 
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded text-red-600">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className='bg-white p-6 sm:p-8 rounded-lg shadow space-y-6'>
         <div>
           <label htmlFor='clientName' className='form-label'>Client Name</label>
-          <input type='text' id='clientName' value={clientName} onChange={(e) => setClientName(e.target.value)} className='default-input' required />
+          <input 
+            type='text' 
+            id='clientName' 
+            value={clientName} 
+            onChange={(e) => setClientName(e.target.value)} 
+            className='default-input' 
+            required 
+          />
         </div>
         <div>
           <label htmlFor='companyName' className='form-label'>Company Name (Optional)</label>
-          <input type='text' id='companyName' value={companyName} onChange={(e) => setCompanyName(e.target.value)} className='default-input' />
+          <input 
+            type='text' 
+            id='companyName' 
+            value={companyName} 
+            onChange={(e) => setCompanyName(e.target.value)} 
+            className='default-input' 
+          />
         </div>
         <div>
           <label htmlFor='email' className='form-label'>Email</label>
-          <input type='email' id='email' value={email} onChange={(e) => setEmail(e.target.value)} className='default-input' />
+          <input 
+            type='email' 
+            id='email' 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            className='default-input' 
+          />
         </div>
         <div>
           <label htmlFor='phone' className='form-label'>Phone</label>
-          <input type='tel' id='phone' value={phone} onChange={(e) => setPhone(e.target.value)} className='default-input' />
+          <input 
+            type='tel' 
+            id='phone' 
+            value={phone} 
+            onChange={(e) => setPhone(e.target.value)} 
+            className='default-input' 
+          />
         </div>
-        {/* Add more fields for address, notes etc. as per Client Detail View */}
+        <div>
+          <label htmlFor='address' className='form-label'>Address</label>
+          <textarea 
+            id='address' 
+            value={address} 
+            onChange={(e) => setAddress(e.target.value)} 
+            className='default-textarea' 
+            rows={3}
+          />
+        </div>
+        <div>
+          <label htmlFor='notes' className='form-label'>Notes</label>
+          <textarea 
+            id='notes' 
+            value={notes} 
+            onChange={(e) => setNotes(e.target.value)} 
+            className='default-textarea' 
+            rows={4}
+          />
+        </div>
         
         <div className='pt-4 border-t flex justify-end'>
-            <button type="submit" className='btn-primary'>
+          <button 
+            type="submit" 
+            className='btn-primary'
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <span className="spinner mr-2" />
+                Saving...
+              </>
+            ) : (
+              <>
                 <Save size={18} className="mr-2" /> Save Client
-            </button>
+              </>
+            )}
+          </button>
         </div>
       </form>
     </div>
