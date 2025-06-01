@@ -73,6 +73,16 @@ export type Invoice = {
   notes: string
 }
 
+export type UserProfile = {
+  id: string
+  created_at: string
+  name: string
+  email: string
+  role: 'Admin' | 'Technician' | 'Manager'
+  avatar_url?: string
+  phone?: string
+}
+
 // Database Schema SQL (to be run in Supabase SQL editor)
 export const schema = `
 -- Enable Row Level Security
@@ -81,6 +91,18 @@ ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Create user profiles table (linked to auth.users)
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  role TEXT DEFAULT 'Technician' CHECK (role IN ('Admin', 'Technician', 'Manager')),
+  avatar_url TEXT,
+  phone TEXT
+);
 
 -- Create tables
 CREATE TABLE IF NOT EXISTS clients (
@@ -153,4 +175,27 @@ CREATE INDEX IF NOT EXISTS idx_quotes_job_id ON quotes(job_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_client_id ON invoices(client_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_job_id ON invoices(job_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_quote_id ON invoices(quote_id);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_email ON user_profiles(email);
+
+-- Row Level Security Policies
+-- Users can only view and update their own profile
+CREATE POLICY "Users can view own profile" ON user_profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can insert own profile" ON user_profiles FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Basic policies for other tables (adjust based on your business logic)
+CREATE POLICY "Authenticated users can view clients" ON clients FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated users can manage clients" ON clients FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can view jobs" ON jobs FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated users can manage jobs" ON jobs FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can view leads" ON leads FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated users can manage leads" ON leads FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can view quotes" ON quotes FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated users can manage quotes" ON quotes FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can view invoices" ON invoices FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated users can manage invoices" ON invoices FOR ALL USING (auth.role() = 'authenticated');
 ` 

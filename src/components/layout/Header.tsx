@@ -13,11 +13,14 @@ import {
   Zap,
   X,
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Header = () => {
+  const { user, logout } = useAuth();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -55,13 +58,21 @@ const Header = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
     setUserDropdownOpen(false);
-    // Add logout animation
-    document.body.classList.add('fade-out');
-    setTimeout(() => {
-      router.push('/login');
-    }, 300);
+    
+    try {
+      await logout();
+      // Add logout animation
+      document.body.classList.add('fade-out');
+      setTimeout(() => {
+        router.push('/login');
+      }, 300);
+    } catch (error) {
+      console.error('Logout error:', error);
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -130,11 +141,16 @@ const Header = () => {
             </button>
             
             {/* Dropdown Menu */}
-            {userDropdownOpen && (
+            {userDropdownOpen && user && (
               <div className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 fade-in'>
                 <div className='px-4 py-2 border-b border-gray-200'>
-                  <p className='text-sm font-medium text-gray-900'>John Doe</p>
-                  <p className='text-xs text-gray-500'>john@example.com</p>
+                  <p className='text-sm font-medium text-gray-900'>{user.name || 'User'}</p>
+                  <p className='text-xs text-gray-500'>{user.email}</p>
+                  {user.role && (
+                    <span className='inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 mt-1'>
+                      {user.role}
+                    </span>
+                  )}
                 </div>
                 <Link
                   href='/settings'
@@ -145,9 +161,19 @@ const Header = () => {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className='w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200'
+                  disabled={isLoggingOut}
+                  className='w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 disabled:opacity-50'
                 >
-                  <LogOutIcon className='mr-2 h-4 w-4' /> Logout
+                  {isLoggingOut ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
+                      Logging out...
+                    </>
+                  ) : (
+                    <>
+                      <LogOutIcon className='mr-2 h-4 w-4' /> Logout
+                    </>
+                  )}
                 </button>
               </div>
             )}

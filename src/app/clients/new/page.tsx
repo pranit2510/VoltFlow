@@ -37,7 +37,12 @@ const CreateClientPage = () => {
 
       router.push('/clients');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create client');
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : typeof err === 'object' && err !== null
+          ? JSON.stringify(err)
+          : 'Failed to create client';
+      setError(errorMessage);
       console.error('Error creating client:', err);
     } finally {
       setIsLoading(false);

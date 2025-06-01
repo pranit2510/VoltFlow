@@ -10,7 +10,10 @@ export const clientOperations = {
       .select()
       .single()
     
-    if (error) throw error
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(`Error creating client: ${error.message}`);
+    }
     return data
   },
 
@@ -138,6 +141,16 @@ export const quoteOperations = {
     
     if (error) throw error
     return data
+  },
+
+  async getAll() {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (error) throw error
+    return data
   }
 }
 
@@ -159,6 +172,16 @@ export const invoiceOperations = {
       .from('invoices')
       .select('*')
       .eq('client_id', clientId)
+      .order('created_at', { ascending: false })
+    
+    if (error) throw error
+    return data
+  },
+
+  async getAll() {
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('*')
       .order('created_at', { ascending: false })
     
     if (error) throw error

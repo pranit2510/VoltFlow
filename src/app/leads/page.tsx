@@ -7,13 +7,14 @@ import {
   Search,
   Eye,
   Edit3,
-  UserPlus,
-  FileText as FileTextIcon,
   Lightbulb
 } from 'lucide-react';
 import SkeletonLoader from '@/components/ui/SkeletonLoader';
+import StatusBadge from '@/components/ui/StatusBadge';
+import FlowActions from '@/components/ui/FlowActions';
+import { leadStages, type LeadStatus } from '@/lib/flowStates';
 
-// Mock data for leads
+// Mock data for leads - enhanced with proper flow statuses
 const mockLeads = [
   {
     id: 'L001',
@@ -22,7 +23,7 @@ const mockLeads = [
     contactEmail: 's.connor@email.com',
     leadSource: 'Website Inquiry',
     estimatedJobValue: 1200,
-    status: 'New',
+    status: 'Qualified' as LeadStatus,
     followUpDate: '2024-05-20',
     descriptionOfNeeds: 'Interested in new lighting fixtures for kitchen.',
     notes: 'Called on May 10th, seemed very interested.',
@@ -35,24 +36,39 @@ const mockLeads = [
     contactEmail: 'k.reese@email.com',
     leadSource: 'Referral',
     estimatedJobValue: 750,
-    status: 'Contacted',
+    status: 'Contacted' as LeadStatus,
     followUpDate: '2024-05-18',
     descriptionOfNeeds: 'Needs panel upgrade for older house.',
     notes: 'Followed up via email on May 15th.',
     assignedTo: 'Admin'
   },
-  // Add more mock leads as needed
+  {
+    id: 'L003',
+    leadName: 'John Matrix',
+    contactPhone: '555-0303',
+    contactEmail: 'j.matrix@email.com',
+    leadSource: 'Google Ads',
+    estimatedJobValue: 2500,
+    status: 'Proposal Sent' as LeadStatus,
+    followUpDate: '2024-05-22',
+    descriptionOfNeeds: 'Complete home rewiring project.',
+    notes: 'Sent detailed proposal on May 15th.',
+    assignedTo: 'Admin'
+  },
+  {
+    id: 'L004',
+    leadName: 'Dutch Schaefer',
+    contactPhone: '555-0404',
+    contactEmail: 'd.schaefer@email.com',
+    leadSource: 'Referral',
+    estimatedJobValue: 500,
+    status: 'New' as LeadStatus,
+    followUpDate: '2024-05-25',
+    descriptionOfNeeds: 'Outlet installation in garage.',
+    notes: 'Initial inquiry received today.',
+    assignedTo: 'Admin'
+  }
 ];
-
-const leadStatusColors: { [key: string]: string } = {
-  New: 'bg-blue-100 text-blue-700',
-  Contacted: 'bg-sky-100 text-sky-700',
-  'Proposal Sent': 'bg-indigo-100 text-indigo-700',
-  Negotiation: 'bg-yellow-100 text-yellow-700',
-  'Closed-Won': 'bg-green-100 text-green-700',
-  'Closed-Lost': 'bg-red-100 text-red-700',
-  'On Hold': 'bg-gray-100 text-gray-700',
-};
 
 const LeadsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,16 +77,13 @@ const LeadsPage = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // Status counts for the sorting bar
+  // Status counts for the sorting bar - using flow states
   const statusCounts = {
     All: mockLeads.length,
-    New: mockLeads.filter(lead => lead.status === 'New').length,
-    Contacted: mockLeads.filter(lead => lead.status === 'Contacted').length,
-    'Proposal Sent': mockLeads.filter(lead => lead.status === 'Proposal Sent').length,
-    Negotiation: mockLeads.filter(lead => lead.status === 'Negotiation').length,
-    'Closed-Won': mockLeads.filter(lead => lead.status === 'Closed-Won').length,
-    'Closed-Lost': mockLeads.filter(lead => lead.status === 'Closed-Lost').length,
-    'On Hold': mockLeads.filter(lead => lead.status === 'On Hold').length,
+    ...Object.keys(leadStages).reduce((acc, status) => {
+      acc[status] = mockLeads.filter(lead => lead.status === status).length;
+      return acc;
+    }, {} as Record<string, number>)
   };
 
   useEffect(() => {
@@ -82,13 +95,21 @@ const LeadsPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleAction = async (action: string, leadId: string) => {
+  const handleFlowAction = async (action: string, leadId: string) => {
     setActionLoading(`${action}-${leadId}`);
     // Simulate action processing
     await new Promise(resolve => setTimeout(resolve, 500));
     setActionLoading(null);
-    // Handle the action
-    console.log(`${action} for lead ${leadId}`);
+    
+    // Handle specific actions
+    switch (action) {
+      case 'convertToClient':
+        console.log(`Converting lead ${leadId} to client`);
+        // In real app, this would make API call and redirect
+        break;
+      default:
+        console.log(`${action} for lead ${leadId}`);
+    }
   };
 
   const filteredLeads = mockLeads.filter(lead => {
@@ -115,7 +136,7 @@ const LeadsPage = () => {
         </Link>
       </div>
 
-      {/* Status Sorting Bar */}
+      {/* Enhanced Status Sorting Bar */}
       <div className='mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4 fade-in' style={{ animationDelay: '0.05s' }}>
         <div className='flex flex-wrap gap-2'>
           {Object.entries(statusCounts).map(([status, count]) => (
@@ -126,7 +147,7 @@ const LeadsPage = () => {
                 statusFilter === status
                   ? status === 'All'
                     ? 'bg-primary text-white shadow-sm hover:bg-primary-dark'
-                    : `${leadStatusColors[status]} shadow-sm`
+                    : leadStages[status as LeadStatus]?.color || 'bg-gray-100 text-gray-700'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200'
               }`}
             >
@@ -157,7 +178,7 @@ const LeadsPage = () => {
         </div>
       </div>
 
-      {/* Leads Table */}
+      {/* Enhanced Leads Table */}
       {isLoading ? (
         <SkeletonLoader variant="table" />
       ) : (
@@ -172,13 +193,14 @@ const LeadsPage = () => {
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Est. Value</th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Status</th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Follow-up</th>
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Next Actions</th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Actions</th>
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>
                 {filteredLeads.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className='px-6 py-4 text-center text-gray-500'>
+                    <td colSpan={8} className='px-6 py-4 text-center text-gray-500'>
                       No leads found matching your criteria.
                     </td>
                   </tr>
@@ -195,47 +217,28 @@ const LeadsPage = () => {
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>{lead.leadSource}</td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>${lead.estimatedJobValue}</td>
                       <td className='px-6 py-4 whitespace-nowrap'>
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${leadStatusColors[lead.status] || 'bg-gray-100 text-gray-700'} transition-all duration-200 group-hover:scale-105`}>
-                          {lead.status}
-                        </span>
+                        <StatusBadge 
+                          module="leads" 
+                          status={lead.status}
+                          showDescription={false}
+                        />
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>{lead.followUpDate}</td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
-                        <div className='flex space-x-2'>
-                          <Link 
-                            href={`/leads/${lead.id}`} 
-                            className='text-primary hover:text-primary-dark transition-colors duration-200 p-1 hover:bg-blue-50 rounded'
-                            title='View Lead'
-                          >
-                            <Eye size={18} />
-                          </Link>
-                          <Link 
-                            href={`/leads/${lead.id}/edit`} 
-                            className='text-gray-600 hover:text-gray-900 transition-colors duration-200 p-1 hover:bg-gray-100 rounded'
-                            title='Edit Lead'
-                          >
-                            <Edit3 size={18} />
-                          </Link>
-                          <button 
-                            onClick={() => handleAction('convert', lead.id)}
-                            disabled={actionLoading === `convert-${lead.id}`}
-                            className='text-green-600 hover:text-green-900 transition-colors duration-200 p-1 hover:bg-green-50 rounded disabled:opacity-50'
-                            title='Convert to Client'
-                          >
-                            {actionLoading === `convert-${lead.id}` ? (
-                              <span className="spinner" />
-                            ) : (
-                              <UserPlus size={18} />
-                            )}
-                          </button>
-                          <Link 
-                            href={`/quotes/new?leadId=${lead.id}`} 
-                            className='text-blue-600 hover:text-blue-900 transition-colors duration-200 p-1 hover:bg-blue-50 rounded'
-                            title='Create Quote'
-                          >
-                            <FileTextIcon size={18} />
-                          </Link>
-                        </div>
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <FlowActions
+                          module="leads"
+                          status={lead.status}
+                          entityId={lead.id}
+                          onAction={handleFlowAction}
+                        />
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 flex items-center'>
+                        <Link href={`/leads/${lead.id}`} className='text-primary hover:text-primary-dark p-1 rounded hover:bg-primary/10 transition-all duration-200' title='View Lead'>
+                          <Eye size={18} />
+                        </Link>
+                        <Link href={`/leads/${lead.id}/edit`} className='text-yellow-600 hover:text-yellow-700 p-1 rounded hover:bg-yellow-100/50 transition-all duration-200' title='Edit Lead'>
+                          <Edit3 size={18} />
+                        </Link>
                       </td>
                     </tr>
                   ))
@@ -245,6 +248,34 @@ const LeadsPage = () => {
           </div>
         </div>
       )}
+
+      {/* Flow Insights Panel */}
+      <div className='mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200 fade-in' style={{ animationDelay: '0.3s' }}>
+        <h3 className='text-lg font-semibold text-gray-900 mb-4 flex items-center'>
+          <Lightbulb className='h-5 w-5 mr-2 text-blue-500' />
+          Lead Flow Insights
+        </h3>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+          <div className='bg-white rounded-lg p-4 shadow-sm'>
+            <div className='text-2xl font-bold text-green-600'>
+              {mockLeads.filter(l => l.status === 'Qualified').length}
+            </div>
+            <div className='text-sm text-gray-600'>Ready for Conversion</div>
+          </div>
+          <div className='bg-white rounded-lg p-4 shadow-sm'>
+            <div className='text-2xl font-bold text-yellow-600'>
+              {mockLeads.filter(l => l.status === 'Proposal Sent').length}
+            </div>
+            <div className='text-sm text-gray-600'>Awaiting Response</div>
+          </div>
+          <div className='bg-white rounded-lg p-4 shadow-sm'>
+            <div className='text-2xl font-bold text-blue-600'>
+              {mockLeads.filter(l => l.status === 'New' || l.status === 'Contacted').length}
+            </div>
+            <div className='text-sm text-gray-600'>Require Follow-up</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
